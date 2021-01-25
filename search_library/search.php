@@ -25,6 +25,7 @@ class searching
         $this->date_filter['month_from']='';
         $this->date_filter['month_to']='';
         //var_dump($input_new);
+		//echo "<pre>";print_r($output);echo "</pre>";
         $pattern_date_btn="/\b(today|last_week|last_month)\b/";
         if(preg_match_all($pattern_date_btn, $input_new, $output) )
         {
@@ -66,7 +67,7 @@ class searching
             
         }
         $input_new= preg_replace($pattern_date_btn, '', $input_new); 
-
+		//echo "<pre>";print_r($output);echo "</pre>";
         $pattern_email= "/\b[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}\b/";
         if(preg_match_all($pattern_email, $input_new, $output) )
         {
@@ -85,13 +86,14 @@ class searching
              
         }
         $data['string']=$expert_and_company; 
+		//echo "<pre>";print_r($data);echo "</pre>";
         array_push($data['string'], $email); 
         $data['email']=$email;    
         if($data['string'][0]='' AND $data['email']='')
         {
             echo "string";
         }
-
+		//echo "<pre>";print_r($query_data);echo "</pre>";
         foreach ($query_data as $key => $value_q)
         {   
             if(!empty($data['string']))
@@ -108,27 +110,33 @@ class searching
                         $append_string_in_sql=implode(' OR ', $attachment);
                         $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$append_string_in_sql.'';
                         array_push($query_array, $query);  
-                    }
+                    } 
                     
                     array_push($get_ids,$value_q['get_id']);   
                 }
             }
+			//echo "===".$query;
             if(!empty($data['email']))
             {
-                if ($value_q['type']=='email') 
+                $value_q['type'] = 'email';
+				$value_q['search_col_name'] = 'email';
+				if ($value_q['type']=='email') 
                 {   
-                    $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$value_q['search_col_name'].'="'.$email.'"';
+                    // $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$value_q['search_col_name'].'="'.$email.'"';
+                    $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$value_q['search_col_name'].' LIKE "%'.$email.'%"';
                     array_push($query_array, $query);
                     array_push($get_ids,$value_q['get_id']); 
                 }
+				//echo "===".$query;
             }
 
         }
-           
+         
         $data['sub_querys']=$query_array;
         $data['get_ids']=$get_ids;
         $string_query=implode(' UNION ', $query_array); 
-        $data['query']=$string_query; 
+        $data['query']=$string_query;
+		//echo "<pre>";print_r($data);echo "</pre>";	
         return $data;    
     }
     function searching_data($ids_of_string)
