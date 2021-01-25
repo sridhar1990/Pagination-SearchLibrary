@@ -130,7 +130,7 @@
         manage_buffer_SendAjax:function(ajax_data)
         {
   
-
+			console.log(ajax_url);
             $.ajax({ 
                         type:"POST",
                         async: "false",
